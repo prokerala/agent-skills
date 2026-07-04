@@ -1,0 +1,12 @@
+# WesternZodiac
+
+**Type:** object
+
+## Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | integer | Yes |  |
+| `name` | string | Yes |  |
+| `lord` | [WesternPlanet](WesternPlanet.md) | Yes |  |
+

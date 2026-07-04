@@ -1,0 +1,50 @@
+name: Publish latest skill archives
+
+on:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-skills-latest
+  cancel-in-progress: true
+
+jobs:
+  publish-latest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build archives and discovery index
+        run: |
+          scripts/build-skill-index.rb \
+            "https://github.com/${GITHUB_REPOSITORY}/releases/download/latest" \
+            dist
+
+      - name: Move the latest tag to this commit
+        run: |
+          git tag --force latest
+          git push --force origin latest
+
+      - name: Create or update the latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view latest >/dev/null 2>&1; then
+            gh release create latest --prerelease --verify-tag \
+              --title "Latest skill archives" \
+              --notes "Rolling release rebuilt on every push to the default branch. Stable entry point: https://github.com/${GITHUB_REPOSITORY}/releases/download/latest/index.json — archive assets are content-addressed (<skill>-<digest>.zip) and referenced from the index."
+          fi
+          gh release upload latest dist/*.zip dist/index.json --clobber
+
+      - name: Prune assets no longer referenced by the index
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for asset in $(gh release view latest --json assets --jq '.assets[].name'); do
+            if [ ! -e "dist/${asset}" ]; then
+              gh release delete-asset latest "${asset}" --yes
+            fi
+          done

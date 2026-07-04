@@ -1,0 +1,29 @@
+name: Publish skill archives
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build archives and discovery index
+        run: |
+          scripts/build-skill-index.rb \
+            "https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}" \
+            dist
+
+      - name: Create release with skill artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "${GITHUB_REF_NAME}" \
+            --notes "Skill archives and agent-skills discovery index. Deploy dist/index.json to https://<domain>/.well-known/agent-skills/index.json" \
+            dist/*.zip dist/index.json
