@@ -50,7 +50,7 @@ Dashboard apps come in two types: **Production** and **Test**. Test apps consume
 - Date-time parameters must be complete ISO 8601 values with the correct timezone offset, for example `2004-02-12T15:19:21+05:30`.
 - Do not hardcode `Z` unless the date-time is actually UTC. For a local birth/event time, pass its real offset such as `+05:30`.
 - URL-encode `+` in timezone offsets as `%2B`; otherwise it can be interpreted as a space. In query strings, send `2004-02-12T15:19:21%2B05:30`, not `2004-02-12T15:19:21+05:30`.
-- Coordinates are passed as `latitude,longitude`, for example `10.214747,78.097626`.
+- Coordinates are passed as `latitude,longitude`, for example `10.214747,78.097626`. To turn a user-entered place name into coordinates and timezone, use the client-side location search widget — see `references/location-search.md`.
 - Encode object query parameters with bracket notation, for example `profile[datetime]`. See `references/query-parameters.md`.
 
 ## Integration Guides
@@ -59,6 +59,7 @@ Dashboard apps come in two types: **Production** and **Test**. Test apps consume
 - Sandbox (Test) apps — free requests, restricted inputs: `references/sandbox.md`
 - Error response envelope, status codes, retries, rate limits, credits: `references/error-handling.md`
 - Query parameter encoding, including object parameters: `references/query-parameters.md`
+- Location search widget — turn a place name into coordinates and timezone: `references/location-search.md`
 - Copy-paste cURL and Node.js examples: `references/examples.md`
 - Official SDKs, example clients, browser/mobile proxy: `references/sdks-and-examples.md`
 
